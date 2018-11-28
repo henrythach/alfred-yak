@@ -10,9 +10,9 @@ class Yak
   def results(query = '')
     {
       items: [{
-        title: "Query: #{query}",
-        subtitle: 'Subtitle one',
-        arg: 'Title one',
+        title: query,
+        subtitle: "Add '#{query}' to list",
+        arg: query,
         autocomplete: 'Title one'
       }]
     }.to_json
