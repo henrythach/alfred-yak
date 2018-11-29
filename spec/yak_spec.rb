@@ -1,5 +1,5 @@
 require 'rspec'
-require_relative '../yak'
+require_relative '../lib/yak'
 
 RSpec.describe Yak do
   let(:yak) { Yak.new }
@@ -45,15 +45,33 @@ RSpec.describe Yak do
     end
   end
 
-  # it 'adds an item' do
-  #   yak = Yak.new(['Add feature', 'Fix bug'])
-  #   yak.add_item('Do laundry')
-  #   expect(yak.items).to eq(['Do laundry', 'Add feature', 'Fix bug'])
-  # end
+  context 'cache initialized' do
+    # always delete the cache before all tests
+    before(:example) do
+      File.open(yak.cache_file, 'w') do |f|
+        f.write ['Fix bugs', 'Shower']
+      end
+    end
 
-  # it 'removes an item' do
-  #   yak = Yak.new(['Buy milk', 'Call mom'])
-  #   yak.remove_item('Buy milk')
-  #   expect(yak.items).to eq(['Call mom'])
-  # end
+    # always delete the cache after all tests
+    after(:example) do
+      File.delete(yak.cache_file) if File.exist?(yak.cache_file)
+      expect(File.exist?(yak.cache_file)).to be false
+    end
+
+    it 'add an item to the beginning of list' do
+      yak.add_item('Do laundry')
+      expect(yak.items).to eq(['Do laundry', 'Fix bugs', 'Shower'])
+    end
+
+    it 'remove an item not in list' do
+      yak.remove_item('Buy milk')
+      expect(yak.items).to eq(['Fix bugs', 'Shower'])
+    end
+
+    it 'remove an item from the list' do
+      yak.remove_item('Shower')
+      expect(yak.items).to eq(['Fix bugs'])
+    end
+  end
 end
