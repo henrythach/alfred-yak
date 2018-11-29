@@ -3,19 +3,32 @@ require 'json'
 
 # Yak class
 class Yak
-  attr_reader :items
+  attr_reader :cache_file
 
-  def initialize(items = [])
+  def initialize
     @cache_file = '.yakcache'
-    @items = items
+  end
+
+  def items
+    if File.exist?(@cache_file)
+      JSON.parse(File.read(@cache_file))
+    else
+      initialize_cache
+      []
+    end
   end
 
   def add_item(s)
-    @items.unshift(s)
+    array = items.unshift(s)
+    save_items_to_cache(array)
+    array
   end
 
   def remove_item(s)
-    @items.delete(s)
+    array = items
+    array.delete(s)
+    save_items_to_cache(array)
+    array
   end
 
   def results(query = '')
@@ -25,6 +38,21 @@ class Yak
         subtitle: 'Add this to to-do'
       }]
     }.to_json
+  end
+
+  private
+
+  def initialize_cache
+    return if File.exist?(@cache_file)
+    File.open(@cache_file, 'w') do |f|
+      f.write [].to_json
+    end
+  end
+
+  def save_items_to_cache(stuff = [])
+    File.open(@cache_file, 'w') do |f|
+      f.write stuff.to_json
+    end
   end
 end
 
