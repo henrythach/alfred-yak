@@ -4,7 +4,7 @@ require_relative '../lib/yak'
 RSpec.describe Yak do
   let(:yak) { Yak.new }
 
-  context 'no cache initialized' do
+  context 'empty cache' do
     # always delete the cache before all tests
     before(:example) do
       File.delete(yak.cache_file) if File.exist?(yak.cache_file)
@@ -43,9 +43,37 @@ RSpec.describe Yak do
     it 'remove an item returns the list of items' do
       expect(yak.remove_item('Exercise')).to eq([])
     end
+
+    context 'with no query' do
+      let(:query) { '' }
+
+      it 'returns a "no results" results' do
+        expected_results = {
+          items: [{
+            title: 'No results!',
+            subtitle: 'Try adding something to the list'
+          }]
+        }.to_json
+        expect(yak.results(query)).to eq(expected_results)
+      end
+    end
+
+    context 'with a query' do
+      let(:query) { 'Get oil change' }
+
+      it 'returns two results' do
+        expected_results = {
+          items: [{
+            title: 'Get oil change',
+            subtitle: 'Add this to the list'
+          }]
+        }.to_json
+        expect(yak.results(query)).to eq(expected_results)
+      end
+    end
   end
 
-  context 'cache initialized' do
+  context 'non-empty cache' do
     # always delete the cache before all tests
     before(:example) do
       File.open(yak.cache_file, 'w') do |f|
@@ -73,5 +101,38 @@ RSpec.describe Yak do
       yak.remove_item('Shower')
       expect(yak.items).to eq(['Fix bugs'])
     end
+
+    context 'with no query' do
+      let(:query) { '' }
+
+      it 'returns a "no results" results' do
+        expected_results = {
+          items: [{
+            title: 'Fix bugs'
+          }, {
+            title: 'Shower'
+          }]
+        }.to_json
+        expect(yak.results(query)).to eq(expected_results)
+      end
+    end
+
+    # context 'with a query' do
+    #   let(:query) { 'Get oil change' }
+
+    #   it 'returns two results' do
+    #     expected_results = {
+    #       items: [{
+    #         title: 'Get oil change',
+    #         subtitle: 'Add this to the list'
+    #       }, {
+    #         title: 'Fix bugs'
+    #       }, {
+    #         title: 'Shower'
+    #       }]
+    #     }.to_json
+    #     expect(yak.results(query)).to eq(expected_results)
+    #   end
+    # end
   end
 end
