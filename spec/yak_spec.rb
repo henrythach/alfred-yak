@@ -65,7 +65,8 @@ RSpec.describe Yak do
         expected_results = {
           items: [{
             title: 'Get oil change',
-            subtitle: 'Add this to the list'
+            subtitle: 'Add this to the list',
+            arg: '--add Get oil change'
           }]
         }.to_json
         expect(yak.results(query)).to eq(expected_results)
@@ -108,9 +109,11 @@ RSpec.describe Yak do
       it 'returns a "no results" results' do
         expected_results = {
           items: [{
-            title: 'Fix bugs'
+            title: 'Fix bugs',
+            arg: '--remove Fix bugs'
           }, {
-            title: 'Shower'
+            title: 'Shower',
+            arg: '--remove Shower'
           }]
         }.to_json
         expect(yak.results(query)).to eq(expected_results)
@@ -124,14 +127,53 @@ RSpec.describe Yak do
         expected_results = {
           items: [{
             title: 'Get oil change',
-            subtitle: 'Add this to the list'
+            subtitle: 'Add this to the list',
+            arg: '--add Get oil change'
           }, {
-            title: 'Fix bugs'
+            title: 'Fix bugs',
+            arg: '--remove Fix bugs'
           }, {
-            title: 'Shower'
+            title: 'Shower',
+            arg: '--remove Shower'
           }]
         }.to_json
         expect(yak.results(query)).to eq(expected_results)
+      end
+    end
+  end
+
+  context '#process' do
+    it 'calls add_todo if query begins with --add' do
+      expect(yak).to receive(:add_todo).with('Hello world')
+      expect(yak).not_to receive(:remove_todo)
+      expect(yak).not_to receive(:results)
+      yak.process('--add Hello world')
+    end
+
+    it 'calls remove_todo if query begins with --remove' do
+      expect(yak).not_to receive(:add_todo)
+      expect(yak).to receive(:remove_todo).with('Fix bugs')
+      expect(yak).not_to receive(:results)
+      yak.process('--remove Fix bugs')
+    end
+
+    context 'empty query' do
+      let(:query) { '' }
+      it 'calls results' do
+        expect(yak).not_to receive(:add_todo)
+        expect(yak).not_to receive(:remove_todo)
+        expect(yak).to receive(:results).with(query)
+        yak.process(query)
+      end
+    end
+
+    context 'non-empty query' do
+      let(:query) { 'Put in work' }
+      it 'calls results' do
+        expect(yak).not_to receive(:add_todo)
+        expect(yak).not_to receive(:remove_todo)
+        expect(yak).to receive(:results).with(query)
+        yak.process(query)
       end
     end
   end

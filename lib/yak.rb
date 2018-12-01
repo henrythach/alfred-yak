@@ -32,22 +32,36 @@ class Yak
 
   def results(query = '')
     items = []
-    items << add_todo_result_item(query) unless query.empty?
+    items << add_todo_result_item(query) unless query.strip.empty?
     items += todos_result_items if todos.any?
     items << empty_result_item if items.empty?
     { items: items }.to_json
   end
 
+  def process(query = '')
+    return add_todo(Regexp.last_match(1)) if /^--add (.+)$/ =~ query
+    return remove_todo(Regexp.last_match(1)) if /^--remove (.+)$/ =~ query
+    results(query)
+  end
+
   private
 
   def todos_result_items
-    todos.map { |item| { title: item } }
+    todos.map { |item| todo_result_item(item) }
+  end
+
+  def todo_result_item(item)
+    {
+      title: item,
+      arg: "--remove #{item}"
+    }
   end
 
   def add_todo_result_item(query)
     {
       title: query,
-      subtitle: 'Add this to the list'
+      subtitle: 'Add this to the list',
+      arg: "--add #{query}"
     }
   end
 
@@ -74,5 +88,4 @@ class Yak
 end
 
 query = ARGV[0]
-yak = Yak.new
-puts yak.results(query) if query
+puts Yak.new.process(query) if query
