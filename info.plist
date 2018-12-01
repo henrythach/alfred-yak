@@ -106,11 +106,11 @@
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Alfred's Script Filter object is extremely powerful, and gives you control over the results displayed in Alfred.
+	<string>A simple to-do Alfred 3 workflow.
 
-Alfred 3 now supports JSON, which is the recommended format. XML is also supported for legacy Alfred 2 workflows, and has been updated to include the new features.
-
-A new option now exists for Script Filters, "Alfred filters results". This allows you to return a whole list of results, let Alfred do the subsequent filtering with extreme performance. When this option is selected, your script will be called once with no argument.</string>
+- Show your todos by taking `yak`.
+- Add a todo by typing stuff after `yak`.
+- Remove a todo by selecting it from the list.</string>
 	<key>uidata</key>
 	<dict>
 		<key>50B0CD10-4D52-4898-9C05-DD3A34A829C3</key>
