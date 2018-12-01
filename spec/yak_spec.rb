@@ -17,31 +17,31 @@ RSpec.describe Yak do
       expect(File.exist?(yak.cache_file)).to be false
     end
 
-    it 'returns empty items' do
-      expect(yak.items).to eq([])
+    it 'returns empty todos' do
+      expect(yak.todos).to eq([])
     end
 
-    it 'add an item initializes the cache' do
-      yak.add_item('Cook dinner')
+    it 'add a todo initializes the cache' do
+      yak.add_todo('Cook dinner')
       expect(File.exist?(yak.cache_file)).to be true
     end
 
-    it 'add an item saves to the cache' do
-      yak.add_item('Eat cake')
+    it 'add a todo saves to the cache' do
+      yak.add_todo('Eat cake')
       expect(JSON.parse(File.read(yak.cache_file))).to eq(['Eat cake'])
     end
 
-    it 'remove an item saves to the cache' do
-      yak.remove_item('Be lazy')
+    it 'remove a todo saves to the cache' do
+      yak.remove_todo('Be lazy')
       expect(JSON.parse(File.read(yak.cache_file))).to eq([])
     end
 
-    it 'add an item returns the list of items' do
-      expect(yak.add_item('Do homework')).to eq(['Do homework'])
+    it 'add a todo returns the list of todos' do
+      expect(yak.add_todo('Do homework')).to eq(['Do homework'])
     end
 
-    it 'remove an item returns the list of items' do
-      expect(yak.remove_item('Exercise')).to eq([])
+    it 'remove a todo returns the list of todos' do
+      expect(yak.remove_todo('Exercise')).to eq([])
     end
 
     context 'with no query' do
@@ -87,19 +87,19 @@ RSpec.describe Yak do
       expect(File.exist?(yak.cache_file)).to be false
     end
 
-    it 'add an item to the beginning of list' do
-      yak.add_item('Do laundry')
-      expect(yak.items).to eq(['Do laundry', 'Fix bugs', 'Shower'])
+    it 'add a todo to the beginning of list' do
+      yak.add_todo('Do laundry')
+      expect(yak.todos).to eq(['Do laundry', 'Fix bugs', 'Shower'])
     end
 
-    it 'remove an item not in list' do
-      yak.remove_item('Buy milk')
-      expect(yak.items).to eq(['Fix bugs', 'Shower'])
+    it 'remove a todo not in list' do
+      yak.remove_todo('Buy milk')
+      expect(yak.todos).to eq(['Fix bugs', 'Shower'])
     end
 
-    it 'remove an item from the list' do
-      yak.remove_item('Shower')
-      expect(yak.items).to eq(['Fix bugs'])
+    it 'remove a todo from the list' do
+      yak.remove_todo('Shower')
+      expect(yak.todos).to eq(['Fix bugs'])
     end
 
     context 'with no query' do
@@ -117,22 +117,22 @@ RSpec.describe Yak do
       end
     end
 
-    # context 'with a query' do
-    #   let(:query) { 'Get oil change' }
+    context 'with a query' do
+      let(:query) { 'Get oil change' }
 
-    #   it 'returns two results' do
-    #     expected_results = {
-    #       items: [{
-    #         title: 'Get oil change',
-    #         subtitle: 'Add this to the list'
-    #       }, {
-    #         title: 'Fix bugs'
-    #       }, {
-    #         title: 'Shower'
-    #       }]
-    #     }.to_json
-    #     expect(yak.results(query)).to eq(expected_results)
-    #   end
-    # end
+      it 'returns two results' do
+        expected_results = {
+          items: [{
+            title: 'Get oil change',
+            subtitle: 'Add this to the list'
+          }, {
+            title: 'Fix bugs'
+          }, {
+            title: 'Shower'
+          }]
+        }.to_json
+        expect(yak.results(query)).to eq(expected_results)
+      end
+    end
   end
 end

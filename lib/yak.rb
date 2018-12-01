@@ -9,7 +9,7 @@ class Yak
     @cache_file = '.yakcache'
   end
 
-  def items
+  def todos
     if File.exist?(@cache_file)
       JSON.parse(File.read(@cache_file))
     else
@@ -17,45 +17,45 @@ class Yak
     end
   end
 
-  def add_item(s)
-    array = items.unshift(s)
-    save_items_to_cache(array)
+  def add_todo(s)
+    array = todos.unshift(s)
+    save_todos_to_cache(array)
     array
   end
 
-  def remove_item(s)
-    array = items
+  def remove_todo(s)
+    array = todos
     array.delete(s)
-    save_items_to_cache(array)
+    save_todos_to_cache(array)
     array
   end
 
   def results(query = '')
-    return results_json if items.any?
-    return empty_results_json if query.empty?
-    {
-      items: [{
-        title: query,
-        subtitle: 'Add this to the list'
-      }]
-    }.to_json
+    items = []
+    items << add_todo_result_item(query) unless query.empty?
+    items += todos_result_items if todos.any?
+    items << empty_result_item if items.empty?
+    { items: items }.to_json
   end
 
   private
 
-  def results_json
-    {
-      items: items.map { |item| { title: item} }
-    }.to_json
+  def todos_result_items
+    todos.map { |item| { title: item } }
   end
 
-  def empty_results_json
+  def add_todo_result_item(query)
     {
-      items: [{
-        title: 'No results!',
-        subtitle: 'Try adding something to the list'
-      }]
-    }.to_json
+      title: query,
+      subtitle: 'Add this to the list'
+    }
+  end
+
+  def empty_result_item
+    {
+      title: 'No results!',
+      subtitle: 'Try adding something to the list'
+    }
   end
 
   def initialize_cache
@@ -66,7 +66,7 @@ class Yak
     []
   end
 
-  def save_items_to_cache(stuff = [])
+  def save_todos_to_cache(stuff = [])
     File.open(@cache_file, 'w') do |f|
       f.write stuff.to_json
     end
